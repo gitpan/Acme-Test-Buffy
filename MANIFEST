@@ -3,3 +3,4 @@ Makefile.PL
 README
 lib/Acme/Test/Buffy.pm
 t/01basic.t
+META.yml                                Module meta-data (added by MakeMaker)

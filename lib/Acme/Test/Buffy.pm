@@ -13,10 +13,10 @@ use strict;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
 
 # this is the first version of the module
-$VERSION = 0.01;
+$VERSION = "0.02";
 
-# load the test builder class.  This class contains all the functions
-# that you use to emmit test results.
+# load the test builder class.  This class contains all the methods
+# that you use to emit test results.
 
 use Test::Builder;
 
@@ -25,7 +25,7 @@ use Test::Builder;
 # class.  Essentially this means that all Test::Builder objects are
 # one and the same object, and this is what allows all classes that
 # make use of Test::Builder to print out "ok 1" "ok 2" etc without
-# getting in each other's way.
+# getting in each other's way and mucking up the order of the numbers
 
 my $Tester = Test::Builder->new();
 
@@ -57,11 +57,11 @@ Acme::Test::Buffy - example Test::Builder testing module
 The reason for writing this module is to demonstrate how you
 can write testing modules that work together with B<Test::Builder>.
 It also shows how to test such modules with B<Test::Builder::Tester>.
-Look at the source code (which is heavly commented) for further
+Look at the source code (which is heavily commented) for further
 enlightenment.
 
 This module simply exports one testing function that tests if a string
-is the same as "Buffy" (case senstative.)
+is the same as "Buffy" (case sensitive.)
 
 =cut
 
@@ -75,7 +75,7 @@ sub is_buffy($;$)
   # simply call the other subroutine.  There's no reason why this
   # couldn't be done here, I just want to show how to call other
   # subroutines in this class.  This supplied a default test
-  # decription
+  # description
   _do_buffy_test(shift(), shift() || "is 'Buffy'");
 }
 
@@ -87,7 +87,7 @@ sub _do_buffy_test
   # as we've entered another subroutine we need to increase the
   # counter that Test::Builder uses to state where the error
   # comes from (so we get an error at the line in your test
-  # script not from within the call to this routine in 'is_buffy'
+  # script not from within the call to this routine in 'is_buffy')
   # we use a local so that the level is returned to the previous
   # value when we exit the subroutine.  Note that we can't use
   # the ++ operator here as it doesn't do what you might think.
@@ -100,7 +100,7 @@ sub _do_buffy_test
   # do the test
   if ($maybe_buffy eq "Buffy")
   {
-    # print okay with the right text
+    # print okay with the right text ("ok <number> - <text>")
     $Tester->ok(1,$text);
 
     # return a true value (don't have to do this but it's nice)
@@ -108,12 +108,19 @@ sub _do_buffy_test
   }
   else
   {
-    # print not okay with the right text
+    # We failed. We want to test Test::Builder to print something
+    # like:
+    #      Failed test at line <line number>
+    #    Expected 'Buffy' but got '<what we got>' instead
+    # that is to say we print failure first, _then_ the extra diag
+    # stuff that will help people debug the code better.
+
+    # print not okay with the right text ("not ok <number> - <text>")
     $Tester->ok(0,$text);
 
     # print diagnostics of *why* it failed.  Don't just print to
     # STDERR this is bad and wrong as it prevents the test output
-    # being properly caught.  Note the "\n" on the end of the 
+    # being properly caught.  Note the "\n" on the end of the
     # line.
     $Tester->diag("Expected 'Buffy' but got '$maybe_buffy' instead\n");
 
@@ -130,16 +137,18 @@ L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Acme-Test-Buffy>
 
 =head1 AUTHOR
 
-Copyright Mark Fowler E<lt>mark@twoshortplanks.comE<gt> 2002.
+   Copyright Mark Fowler
+   E<lt>mark@twoshortplanks.comE<gt> 2002-2004
+   All rights reserved.
 
-This program is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+  This program is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.
 
 =head1 NOTES
 
-Module also written to annoy Leon Brocard, who will have to
-update his YAPC::Europe talk slides to include it a mere ten
-minutes before his talk.
+Module also written to annoy Leon Brocard, who will have to update his
+YAPC::Europe talk slides to include it a mere ten minutes before his
+talk.
 
 =head1 SEE ALSO
 
